@@ -10,9 +10,6 @@ const contras = process.env.CONTRAS
 const config = {
     authSecret:process.env.TOK_AUTH, // secret for generating jwt token
   }
-  console.log(config)
-  console.log('contras')
-  console.log(contras)
 router.get('/validarToken', authe, async ( req, res)=>{
     return res.status(200).json({
         status:200,
