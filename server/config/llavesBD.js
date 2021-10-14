@@ -1,10 +1,10 @@
 module.exports = {
     mongodb:{
-        uri :'mongodb+srv://apsaconvenios:G1ICE8P1qrY3m70k@apsapruebas.etmg0.mongodb.net/apsapruebas?retryWrites=true&w=majority',
+        uri :'mongodb+srv://apsaconvenios:G1ICE8P1qrY3m70k@apsapruebas.etmg0.mongodb.net/apsa?retryWrites=true&w=majority',
             options:{
             useNewUrlParser:true, useCreateIndex:true, useUnifiedTopology: true 
         }   
-    }//G1ICE8P1qrY3m70k-------apsaconvenios -----mongodb+srv://apsaconvenios:G1ICE8P1qrY3m70k>@apsapruebas.etmg0.mongodb.net/apsaconvenios?retryWrites=true&w=majority
+    }//G1ICE8P1qrY3m70k-------apsaconvenios -----mongodb+srv://apsaconvenios:G1ICE8P1qrY3m70k@apsapruebas.etmg0.mongodb.net/apsaconvenios?retryWrites=true&w=majority
 } 
 
 
