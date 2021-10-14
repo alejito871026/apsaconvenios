@@ -3,7 +3,7 @@ const router = express.Router();
 const authe = require('../middlewareServer/authenticacion.js');
 const authe2 = require('../middlewareServer/authenticacionDos.js');
 const Cliente = require('../models/Clientes.js');
-const EditCliente = require('../models/EditCliente.js');
+const EditCliente = require('../models/editCliente.js');
 //const Fiador = require('../models/fiador');
 
 router.post('/busqueda', authe2, async (req, res)=>{
