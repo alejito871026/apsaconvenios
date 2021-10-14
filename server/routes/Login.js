@@ -218,28 +218,28 @@ function cargarPass (empleado,n){
                 valid:true
             }
             resolve(r)
-        //    let okEnvio = enviarPass(pass,empleado) //aca ejecturamos el .then 
-        //    okEnvio.then(res => {
-        //        if(res===true){
-        //            let r = {
-        //                pass,
-       //                valid:true
-        //            }
-         //           resolve(r)
-        //        }
-        //        if(res==='Numero de telefono invalido') {
-        //            let r = {
-        //                cod:101,
-        //                res,
-        //                valid:false
-        //            }
-        //            resolve(r)
-        //        }
-        //        if(res!=true) {
+            let okEnvio = enviarPass(pass,empleado) //aca ejecturamos el .then 
+            okEnvio.then(res => {
+                if(res===true){
+                    let r = {
+                        pass,
+                       valid:true
+                    }
+                    resolve(r)
+                }
+                if(res==='Numero de telefono invalido') {
+                    let r = {
+                        cod:101,
+                        res,
+                        valid:false
+                    }
+                    resolve(r)
+                }
+                if(res!=true) {
             //aca validaremos cuando sea falso para enviar a al metodo que pide respuestas que a pasado
-        //           console.log(res)     
-        //        }
-        //    })            
+                   console.log(res)     
+                }
+            })            
         }
         if(n===2){
             let r = {
