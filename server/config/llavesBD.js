@@ -1,11 +1,14 @@
 module.exports = {
     mongodb:{
-        uri :'mongodb://localhost/apsa',
+        uri :'mongodb://apsa:871026@apsa-shard-00-00-fgfgw.mongodb.net:27017,apsa-shard-00-01-fgfgw.mongodb.net:27017,apsa-shard-00-02-fgfgw.mongodb.net:27017/apsa?authSource=admin&replicaSet=apsa-shard-0&w=majority&readPreference=primary&appname=MongoDB%20Compass&retryWrites=true&ssl=true',
             options:{
             useNewUrlParser:true, useCreateIndex:true, useUnifiedTopology: true 
         }   
-    }
+    }//G1ICE8P1qrY3m70k-------apsaconvenios -----mongodb+srv://apsaconvenios:G1ICE8P1qrY3m70k>@apsapruebas.etmg0.mongodb.net/apsaconvenios?retryWrites=true&w=majority
 } 
+
+
+
 //base de datos de prueba local
 //'mongodb://localhost/apsa',
 //base de datos de prueba en la nube de mongo atlas
