@@ -12,7 +12,8 @@ router.post('/busqueda', authe2, async (req, res)=>{
     if(cliente){
         return res.json({
             cliente,
-            status:200
+            status:200,
+            success:true
         })
     }
     

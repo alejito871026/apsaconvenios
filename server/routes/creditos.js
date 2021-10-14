@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const schedule = require('node-schedule');
 const Creditos = require('../models/Creditos');
 const infoLaborall = require('../models/infoLaboral');
 const referidoss = require('../models/referidos');
@@ -17,6 +18,12 @@ router.post('/creditosApagar',authe, async (req, res)=>{
     let end = new Date(req.body.fdos)
     var credito= await Creditos.find({"estado":"activo","estadoInterno":"Entregado", "Fp":{"$gte" : start,"$lte" : end}}).sort({Fp:1}).populate('cliente')
     res.json(credito)
+})
+router.post('/fiadorUnico', authe, async (req, res)=>{
+    var x =(req.body)
+    var Fiador= await fiador.find({"cedulaFiador":x.cedulaFiador})
+    console.log(Fiador)
+    res.json(Fiador)
 })
 router.post('/verValoresCredito',authe, async (req, res)=>{
     var x =(req.body._id)
@@ -453,4 +460,73 @@ async function guardarEmpleadoCreador(creado){
 async function numeroCredito(){
     const cantidad = await Creditos.countDocuments()
     return cantidad + 1
+}
+async function creditos (){ 
+    let start = new Date()
+    let end = new Date()
+    start.setDate(end.getDate()-1)
+    end.setDate(end.getDate()+1)
+    console.log(start)
+    console.log(end)
+    const cred  = await Creditos.find({"estado":"activo", "estadoInterno":"Entregado","Fp":{"$gt" :start,"$lte" : end}}).populate('cliente')
+    return cred
+}
+const job = schedule.scheduleJob('24 19 07 * * * ', function(){
+    console.log('The answer to life, the universe30!');
+    creditos().then(val => {
+        paraMensajes(val)            
+    })
+  });
+paraMensajes = (creditos)=>{
+    let credito = {}
+    let x = 0
+    let intervalo = setInterval(() => {
+        if (x<creditos.length) {
+            credito = {
+                numero : creditos[x].numeroCredito,
+                celular :creditos[x].cliente.celularUnoCliente,
+                valor : creditos[x].valCuotaMens,
+                fecha : creditos[x].Fp,
+            }
+            let envio = sending2(credito)
+        }else{
+            clearInterval(intervalo)
+            console.log('cerrando')
+        }
+        x++;
+    }, 1000);
+}
+function verFecha(fecha){
+    var meses = new Array ("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
+    let fech = new Date (fecha)
+    const  y = fech.getDate() +'-'+meses[fech.getMonth()]+'-'+ fech.getFullYear() 
+    return y         
+}
+function sending2(cliente){
+    console.log(cliente)
+    let fecha = verFecha(cliente.fecha)
+    console.log(fecha)
+    //Instale request ejecutando el comando "npm install --save request"    
+    var requests = require("request");
+    let message = 'CONVENIOS APSA le recuerda el pago oportuno de su CUOTA. Fecha próxima de pago: '+fecha+' del crédito #'+cliente.numero+' por valor de '+cliente.valor+'.'
+    let security = 'c69e76348690224994fce02324f538eb19024406604fa255b4b3e'
+    let client = 1942
+    let phone2 = cliente.celular.toString()
+    var options = { 
+    method: 'POST',
+    url: 'https://www.onurix.com/api/v1/send-sms',
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    formData: {
+        key:security,
+        client:client,
+        phone:'+57'+phone2,
+        sms:message,
+        'country-code':'CO'
+            }
+    };
+
+    requests(options, function (error, response, body) {
+        if (error) throw new Error(error);
+        console.log(body);
+    }); 
 }

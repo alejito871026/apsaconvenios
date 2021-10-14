@@ -20,7 +20,7 @@
                     <tbody>
                         <tr v-for="(egreso, index) in egresos" :key="egreso._id">
                             <td>{{index + 1}}</td>
-                            <td>{{new Intl.NumberFormat('es-CO').format(egreso.valor)}}</td>
+                            <td>{{new Intl.NumberFormat('es-CO').format(egreso.valor)}} + {{new Intl.NumberFormat('es-CO').format(egreso.cuotaInicial)}} = {{new Intl.NumberFormat('es-CO').format(egreso.valor+egreso.cuotaInicial)}}</td>
                             <td>{{egreso.numCredito}}</td>
                             <td>{{egreso.nombreCliente}}</td>
                             <td>{{egreso.descripcion}}</td>

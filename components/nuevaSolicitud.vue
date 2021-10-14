@@ -1211,6 +1211,50 @@ export default {
     },
     methods: {
         ...mapMutations('storeViewComponentsCreditos',['estadoBuscadorClienteCreditoNuevo','estadoBotonAgregarCredito','estadoCargarCreditos']),
+        async validarFiador(cedulaFiador){
+            const cc={
+                cedulaFiador:cedulaFiador
+            }
+            const fiador = await this.$axios.$post('/creditos/fiadorUnico',cc)
+            console.log(fiador)
+            if(fiador.length<1){
+                alert('no existe fiador con esa cedula se procedera a buscar por clientes')
+                this.Fiador = new fiadorr()
+                this.verClienteFiador(cc)
+            }else{
+                this.Fiador = fiador[0]
+            }
+        },
+        async verClienteFiador(cedula){
+            console.log(cedula.cedulaFiador)
+            const ccc = cedula.cedulaFiador
+            let cc = {
+                cedulaId:ccc
+            }
+            const fiador = await this.$axios.$post('/clientes/busqueda',cc)
+            if(fiador.success){
+                if(fiador.cliente.length<1){
+                    alert('No exste cliente con esa cedula para servirlo de fiador')
+                    this.Fiador = new fiadorr()
+                }else{
+                    this.Fiador.nombreFiador = fiador.cliente[0].nombreCliente
+                    this.Fiador.primerApellidoFiador = fiador.cliente[0].primerApellidoCliente
+                    this.Fiador.segundoApellidoFiador = fiador.cliente[0].segundoApellidoCliente
+                    this.Fiador.cedulaFiador = fiador.cliente[0].cedulaId
+                    this.Fiador.celularUnoFiador = fiador.cliente[0].celularUno
+                    this.Fiador.celularDosFiador = fiador.cliente[0].celularDos
+                    this.Fiador.barrioFiador = fiador.cliente[0].barrioCliente
+                    this.Fiador.tViviendaFiador = fiador.cliente[0].tViviendaCliente
+                    this.Fiador.ocupacionFiador = fiador.cliente[0].OcupacionCliente
+                    this.Fiador.direccionFiador = fiador.cliente[0].direccionCliente
+                    this.Fiador.ciudadFiador = fiador.cliente[0].ciudadCliente
+                    this.Fiador.emailFiador = fiador.cliente[0].emailCliente
+                    this.Fiador.edadFiador = fiador.cliente[0].edadCliente
+                    this.Fiador.PcargoFiador = fiador.cliente[0].PcargoCliente
+                }                
+            }
+            console.log(fiador.cliente)
+        },
         validarReferencia(rfamiliar){
             if(rfamiliar.nombreRF == '' || rfamiliar.nombreRF==undefined
                 ||rfamiliar.direccionRF=='' || rfamiliar.direccionRF ==undefined

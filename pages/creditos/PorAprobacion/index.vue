@@ -24,11 +24,11 @@
                         </div>
                         <div class="input-group mb-3" v-if="creditoUnico.infoLab.informacionCliente.arrendoOk">
                             <span class="input-group-text">Tiempo habitando la misma casa</span>
-                            <div class="form-control">creditoUnico.infoLab.informacionCliente.tiempoEnCasa</div>                        
+                            <div class="form-control">{{creditoUnico.infoLab.informacionCliente.tiempoEnCasa}}</div>                        
                         </div>
                         <div class="input-group mb-3" v-if="creditoUnico.infoLab.informacionCliente.Objecion">
                             <span class="input-group-text">Observacion de la visita</span>
-                            <textarea class="form-control" disabled v-model="creditoUnico.infoLab.informacionCliente.Objecionn"></textarea>
+                            <textarea class="form-control" disabled v-model="creditoUnico.infoLab.informacionCliente.Objecion"></textarea>
                         </div>
                     </div>
                     <div v-if="creditoUnico.infoLab.validadoInfoLaboral">

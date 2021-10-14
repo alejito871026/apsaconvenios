@@ -301,7 +301,7 @@ router.post('/ingresosCreditosCapInt',authe, async (req, res)=>{
     let page = (req.body.pagina-1)  
     let pageSize = 20                   // Similar a 'límite'
     const skip = (page) * pageSize;        // Para la página 1, el salto es: (0) * 20 => 0 * 20 = 0
-    const ingresos = await Ingresos.find( {concepto:{ $in :['cuota credito','Abono','Abono a capital','cuota credito al final','cuota credito disminucion capital','Renovacion']}}).sort({fechaIngresoEfectivo:-1}).skip(skip).limit(20)
+    const ingresos = await Ingresos.find( {concepto:{ $in :['cuota credito','Abono','Abono a capital','cuota credito al final','cuota credito disminucion capital','Renovacion','Pago total']}}).sort({fechaIngresoEfectivo:-1}).skip(skip).limit(20)
     if(ingresos){
         return res.status(200).json({
             ingresos,
@@ -311,7 +311,7 @@ router.post('/ingresosCreditosCapInt',authe, async (req, res)=>{
     }
 })
 router.post('/totalIngresosCreditosCapInt',authe, async (req, res)=>{
-    let total = await Ingresos.find({concepto:{ $in :['cuota credito','Abono','Abono a capital','cuota credito al final','cuota credito disminucion capital','Renovacion']}}).countDocuments()
+    let total = await Ingresos.find({concepto:{ $in :['cuota credito','Abono','Abono a capital','cuota credito al final','cuota credito disminucion capital','Renovacion','Pago total']}}).countDocuments()
     res.json(total)
 })
 router.post('/ingresosComision',authe, async (req, res)=>{
@@ -349,10 +349,10 @@ router.post('/totalIngresosCreditosInteresMora',authe, async (req, res)=>{
     res.json(total)
 })
 router.post('/ingresosCreditosInicial',authe, async (req, res)=>{
-    let page = (req.body.pagina-1)  
+    let page = (req.body.pagina-1)   
     let pageSize = 20                   // Similar a 'límite'
     const skip = (page) * pageSize;        // Para la página 1, el salto es: (0) * 20 => 0 * 20 = 0
-    const ingresos = await Ingresos.find({concepto:'inicial'}).sort({fechaIngresoEfectivo:-1}).skip(skip).limit(20)
+    const ingresos = await Ingresos.find({concepto:'inicial'}).populate('idCredito').sort({fechaIngresoEfectivo:-1}).skip(skip).limit(20)
     if(ingresos){
         return res.status(200).json({
             ingresos,

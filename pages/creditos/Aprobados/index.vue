@@ -313,17 +313,6 @@ export default {
                 alert('a ocurrido un error al guardar el ingreso'+ ingresoOk.data)
             }
         },
-        async validarIngresoInicialCaja(id,cuotaInicial,codigo,ic,cedulaCliente){
-            let ingresoInicial ={
-                id,
-                cuotaInicialRecibidaPor : this.$auth.$state.user._id ,
-            }
-            const recibidaOk = await this.$axios.$post("/creditos/recibidaInicial", ingresoInicial)
-            if (recibidaOk.success){
-                this.credito.cuotaInicialEntregada = true
-                this.ingresoInicialCredito(id,cuotaInicial,codigo,ic)
-            }
-        },
         async entregado(producto,id,valor,cn,cs,cuotainicial,credito){
             if(this.impreso==false){
                 alert('no se imprimio') 

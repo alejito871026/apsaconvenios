@@ -152,7 +152,7 @@ export default {
     abrirEgreso(){
       this.ingreso = false
       this.ingresoDineroCreditos = false
-      this.egresos = true
+      this.egreso = true
       this.egresoEfectivo = {
         concepto:'',
         valor:0,
@@ -167,7 +167,7 @@ export default {
     abrirIngreso(){
       this.ingreso = true
       this.ingresoDineroCreditos = false
-      this.egresos = false
+      this.egreso = false
       this.egresoEfectivo = {
         concepto:'',
         valor:0,
@@ -182,7 +182,7 @@ export default {
     abrirIngresoADS(){
       this.ingreso = false
       this.ingresoDineroCreditos = true
-      this.egresos = false
+      this.egreso = false
       this.egresoEfectivo = {
         concepto:'',
         valor:0,

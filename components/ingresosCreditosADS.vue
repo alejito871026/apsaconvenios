@@ -12,8 +12,6 @@
                         <th>Capital</th>
                         <th>Interes</th>
                         <th>Total</th>
-                        <th># Credito</th>
-                        <th>Nombre</th>
                         <th>fecha de pago</th>
                     </tr>
                 </thead>
@@ -23,8 +21,6 @@
                             <td>{{new Intl.NumberFormat('es-CO').format(ingreso.capital)}}</td>
                             <td>{{new Intl.NumberFormat('es-CO').format(ingreso.interes)}}</td>
                             <td>{{new Intl.NumberFormat('es-CO').format(ingreso.capital + ingreso.interes)}}</td>
-                            <td>{{ingreso.numeroCredito}}</td>
-                            <td>{{ingreso.nombre}}</td>
                             <td>{{verFecha(ingreso.fechaIngresoEfectivo)}}</td>
                         </tr>
                     </tbody>

@@ -10,8 +10,6 @@
                     <tr>
                         <th># Egreso</th>
                         <th>Valor</th>
-                        <th># Credito</th>
-                        <th>Nombre</th>
                         <th>Descripcion</th>
                         <th>fecha de pago</th>
                     </tr>
@@ -20,8 +18,6 @@
                         <tr v-for="(egreso, index) in egresos" :key="index">
                             <td>{{index + 1}}</td>
                             <td>{{new Intl.NumberFormat('es-CO').format(egreso.valor)}}</td>
-                            <td>{{egreso.numCredito}}</td>
-                            <td>{{egreso.nombreCliente}}</td>
                             <td>{{egreso.descripcion}}</td>
                             <td>{{verFecha(egreso.fechaEgreso)}}</td>
                         </tr>

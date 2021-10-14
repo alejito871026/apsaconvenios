@@ -8,7 +8,7 @@ const IngresosSquema = new Schema({
     nombre: { type:String},
     numeroCredito: { type:Number},
     descripcion : { type : String},
-    idCredito: { type: String},
+    idCredito: { type: Schema.Types.ObjectId, ref:'Credito'},
     codigoEmpleado:{ type:String},
     fechaIngresoEfectivo:{type: Date},
 });

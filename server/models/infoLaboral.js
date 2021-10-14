@@ -8,7 +8,7 @@ const infoLaboralSquema = new Schema({
         visitaOK:{type:Boolean},
         telefonoOk:{ type: Boolean},
         casaOk:{type:Boolean},
-        arriendoOk:{type:Boolean},
+        arrendoOk:{type:Boolean},
         negocioOk:{type:Boolean},
         tiempoEnCasa:{type:String},
         Objecion:{ type: String},
