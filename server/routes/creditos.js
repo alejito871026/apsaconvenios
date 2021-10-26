@@ -111,7 +111,7 @@ router.post('/contarCreditos', async (req, res) => {
 })
 router.post('/guardarCredito', async (req, res) => {
     let h = new Date()
-    new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
+    let hoy = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
     console.log(req.body)
     let credito = {} 
     credito.cliente = req.body.cliente 

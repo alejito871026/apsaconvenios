@@ -48,7 +48,7 @@ export default {
     sockets: [ // Required
       { // At least one entry is required
         name: 'Listados',
-        url: 'https://apsaconvenios.herokuapp.com/',
+        url:'https://apsaconvenios.herokuapp.com',
         default: true,
       }
     ],
@@ -104,3 +104,7 @@ export default {
     { path: '/server', handler: '~/server/server.js' }
   ]
 }
+//'https://apsaconvenios.herokuapp.com/'
+ //baseURL: 'https://apsaconvenios.herokuapp.com/server',
+ //'http://localhost:3000'
+//baseURL: 'http://localhost:3000/server',
