@@ -51,7 +51,6 @@
 
 <script>
 export default {
-    name:'listado',
     data(){
       return{
         fUno:'',

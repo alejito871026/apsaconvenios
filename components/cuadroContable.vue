@@ -102,7 +102,7 @@
                 </table>
                 <div class="col-sm-4">
                   <div class="container bg-primary text-white">
-                    <h2 ><strong>TOTAL : $ {{new Intl.NumberFormat('es-CO').format(totalIngInteres)}}</strong></h2>
+                    <h2 ><strong>TOTAL : $ {{new Intl.NumberFormat('es-CO').format(totalVentasEfectivo)}}</strong></h2>
                   </div>
                 </div>
               </div>
