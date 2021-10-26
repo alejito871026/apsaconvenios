@@ -9,7 +9,7 @@ const EgresosSquema = new Schema({
     idCredito:{type : String},
     cuotaInicial:{type:Number},
     numCredito:{type:Number},
-    fechaEgreso:{type: String},
+    fechaEgreso:{type: Date},
     egreso:{type:Boolean},
     codigoEmpleadoReflejadoEgreso:{type: String},
     fechaReflejadoEgreso:{type: Date},

@@ -48,7 +48,7 @@ export default {
     sockets: [ // Required
       { // At least one entry is required
         name: 'Listados',
-        url: 'https://apsaconvenios.herokuapp.com',
+        url: 'https://apsaconvenios.herokuapp.com/',
         default: true,
       }
     ],

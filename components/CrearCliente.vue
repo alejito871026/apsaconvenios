@@ -173,9 +173,7 @@ export default {
   props:['cc'],
   data(){
       return {
-          cliente:{
-            fechaAgregadoCliente: new Date()
-          },
+          cliente:{},
           editando:false,
       }
   },
@@ -212,6 +210,9 @@ export default {
           alert('todos los campos son obligatorios')
           return
       }else{ 
+        let h = new Date()
+        let hoy = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
+        this.cliente.fechaAgregadoCliente = hoy
         let cliente = this.cliente
         console.log(this.cliente)
         let res  = await this.$axios.$post("clientes/registro",cliente)

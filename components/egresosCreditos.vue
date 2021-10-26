@@ -101,8 +101,10 @@ export default {
                 alert('si no hay comision debes escribir el 0')
                 return
             }else{
+                let h = new Date()
+                let hoy = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
                 datos.comision = parseInt(datos.comision)
-                datos.fechaReflejadoEgreso = new Date()
+                datos.fechaReflejadoEgreso = hoy
                 datos.codigoEmpleadoReflejadoEgreso = this.$auth.$state.user._id
                 const desembolsoOk = await this.$axios.$post('/contabilidad/desembolsarOk',datos)
                 if(desembolsoOk.success){

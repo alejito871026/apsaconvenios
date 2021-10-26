@@ -22,6 +22,12 @@ const prendaSquema = new Schema({
     nombrePropietario: { type: String},
     ccPropietario : { type: Number},
     fiador_o_prenda: {type: String},
+    validadoInfoPrenda:{type:Boolean, default:false},
+    infoPrenda:{
+        pignoracionOk:{type:Boolean},
+        validadoPor:{ type: Schema.Types.ObjectId, ref:'Empleado'},
+        Objecion:{ type: String},
+    },
     fiadorPrenda: {type: Object},
     infolabfiadorPrenda:{type: Object},
 });

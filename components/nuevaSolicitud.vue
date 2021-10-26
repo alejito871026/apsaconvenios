@@ -1171,7 +1171,6 @@ export default {
             pfecha: 0,
             verHoy:false,
             verHoyy:false,
-            agTipo:false,
             date:'',
             pfechaComparacion:0,
             fueraDeRango:false,
@@ -1340,8 +1339,9 @@ export default {
             }             
         },
         cargarInfo(frecuencia){
-            let hoy = new Date()
-            let pf = new Date()             
+            let h = new Date()
+            let hoy = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
+            let pf = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))             
             if(frecuencia==='Mensual' || frecuencia==='Pago Unico'){
                 pf = pf.setDate(pf.getDate()+8)
                 let rpf = new Date(pf)
@@ -1366,7 +1366,7 @@ export default {
             if(frecuencia==='Semanal'){
                 this.verHoy = false
                 let n = parseInt(this.credit.tiempo)
-                let r = new Date()
+                let r = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
                 let rr = r.setMonth(r.getMonth()+n)
                 this.hoy = this.verFecha(rr,1)
                 this.verHoyy = true
@@ -1388,26 +1388,26 @@ export default {
             this.credit.cantidad = this.credit.cantidad - this.credit.cuotaInicial
         }, 
         async verTipos(){
-            let tipos  = await this.$axios.$get('/productos/verTipos')   
-            this.tipos=tipos
-            this.tipos.push({tipoProducto:'PARA AGREGAR UN NUEVO PRODUCTO PORFAVOR DIRIJASE AL APARTADO DE PRODUCTOS'})            
+            this.tipos  = await this.$axios.$get('/productos/verTipos')  
+        },
+        referirProducto(id){
+            console.log(id)
+            const result = this.productosTipo.filter(producto => producto._id == id)
+            console.log(result)
+            this.valorVenta = result[0].valorVenta
+            this.credit.cantidad = result[0].valorVenta
         },
         async validTipo(x){
-            if(x!='PARA AGREGAR UN NUEVO PRODUCTO PORFAVOR DIRIJASE AL APARTADO DE PRODUCTOS'){
-                let tipo={
-                    tip:x
-                }
-                this.agTipo = false
-                let productosTipo =  await this.$axios.$post('/productos/productosTipo',tipo)                
-                    productosTipo 
-                    if(productosTipo.length>0){
-                        this.productoAvender = true
-                    }else{
-                        this.productoAvender = false
-                    }
+            let tipo={
+                tip:x
+            }
+            this.productosTipo =  await this.$axios.$post('/productos/productosTipo',tipo) 
+            if(this.productosTipo.length>0){
+                this.productoAvender = true
             }else{
-                this.agTipo = true 
-            }    
+                this.productoAvender = false
+                console.log('no hay productos en esta categoria')
+            }               
         },
         calcularCredito(){
             this.credito = {}
@@ -1475,7 +1475,7 @@ export default {
             this.credito.credito = this.credit  
             this.credito.credito.creadoPor = this.$auth.$state.user._id
             this.credito.credito.cantidad = parseInt(this.credito.credito.cantidad)
-            this.credito.credito.interes = parseInt(this.credito.credito.interes)
+            this.credito.credito.interes = parseFloat(this.credito.credito.interes)
             this.credito.credito.tiempo = parseInt(this.credito.credito.tiempo)
             this.credito.credito.inicial = parseInt(this.credito.credito.cuotaInicial) 
             this.credito.credito.aumentoPorDias = parseInt(this.aumentoPorDias)            
@@ -1528,8 +1528,8 @@ export default {
                 this.validado = true
                 this.boton = false
             }  
-//si validamos que todos los campos estan llenos y que toda la informacion esta completa
-//procedemos a hacer los calculos para mostrar los valores del credito 
+            //si validamos que todos los campos estan llenos y que toda la informacion esta completa
+            //procedemos a hacer los calculos para mostrar los valores del credito 
             if(this.validado){
                 this.valores.interesMensual= f.calcularInteresMensual(this.credito.credito.cantidad,this.credito.credito.interes)
                 this.valores.valorTotalCredito=f.totalCredito(this.credito.credito.tiempo,this.credito.credito.cantidad,this.valores.interesMensual)
@@ -1544,11 +1544,31 @@ export default {
                 this.boton = true
             }
         },
+        entregarProducto(id,valorVentaFinal,cliente,efectivo){
+            let h = new Date()
+            let hoy = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
+            let idd={
+                id,
+                valorVentaFinal,
+                efectivo,
+                cliente,
+                fechaVenta:hoy
+            }
+            this.$axios.$post('/productos/entregarProducto',idd)
+            .then(res => {
+                console.log('se a actualizado elproducto')
+                
+            })
+            .catch(err => console.log(err));
+        },
         async guardarCredito(){
             const credito = this.credito
             console.log(credito)
             const guardarCredito = await this.$axios.$post('/creditos/guardarCredito',credito)
             if(guardarCredito.success){
+                if(credito.credito.producto){
+                    this.entregarProducto(credito.credito.producto,credito.credito.cantidad,credito.cliente,false)
+                }
                 this.estadoEmpleo={
                     emplee: false,
                     indepp: false,

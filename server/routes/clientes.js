@@ -17,6 +17,12 @@ router.post('/busqueda', authe2, async (req, res)=>{
         })
     }
     
+}) 
+router.post('/busquedaa', authe2, async (req, res)=>{
+    const x =(req.body.cedulaId)
+    const cliente = await Cliente.find({"cedulaIdCliente":x})
+    res.json(cliente)
+    
 })
 router.post('/activos',authe, async (req, res)=>{
     let page = (req.body.pagina)  
@@ -64,11 +70,13 @@ router.post('/guardarEdicionCliente', authe, async (req, res, next)=>{
     if(!persona){
         return next(new Error('no se pudo cargar documento'))
     }else{
+        let h = new Date()
+    let hoy = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
         const editado = new EditCliente();
             editado.cedulaIdCliente=req.body.cedulaIdCliente;
             editado.modificacion=req.body.descripcionEdicion;
             editado.idEmpleadoEditor=req.body.codigoEmpleadoEditor;
-            editado.fechaEdicion=new Date()
+            editado.fechaEdicion=hoy
             editado.datosAnteriores=persona;
             const  guardado = await editado.save();
             if(!guardado){

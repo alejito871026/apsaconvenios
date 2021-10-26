@@ -5,6 +5,7 @@
       <h1><strong>CONTABILIDAD</strong></h1>
     </div>
     <caja/>
+    <cuadro-contable/>
   </div>
 </template>
 

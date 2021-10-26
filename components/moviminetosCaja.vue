@@ -17,15 +17,19 @@
             <div class="card-header bg-white">
               <h1 class="text-center">ingreso de efectivo al sistema</h1>
             </div>
+               
               <div class="card-body justify-content-center">
+                <select class="form-control col-md-12" v-model="ingresoEfectivo.concepto">
+                  <option v-for="option in options" :key="option" >{{option}}</option>
+                </select>
                 <h3 class="text-center p-4">Valor a ingresar $</h3>           
-                <input type="number" min="0" class="col-md-12" required v-model="ingresoEfectivo.valor">            
+                <input type="number" min="0" class="form-control col-md-12" required v-model="ingresoEfectivo.valor">            
                 <h3 class="text-centerc p-4">Descripcion del ingreso</h3>            
-                <textarea class="col-md-12" rows="4" required v-model="ingresoEfectivo.descripcion"></textarea>
+                <textarea class="col-md-12 form-control" rows="4" required v-model="ingresoEfectivo.descripcion"></textarea>
             </div>
             <div class="card-footer bg-white">
               <div class="btn-group mb-3 col-lg-12">
-                <div class="btn btn-warning" @click="guardarIngresoEfectivo('otros',ingresoEfectivo)">Guardar Ingreso</div>
+                <div class="btn btn-warning" @click="guardarIngresoEfectivo(ingresoEfectivo.concepto,ingresoEfectivo)">Guardar Ingreso</div>
                 <div class="btn btn-danger" @click="cerrarIngreso()">Volver</div>
               </div>
             </div>
@@ -72,6 +76,7 @@
                   <option value="funcionamiento">Funcionamiento</option>
                   <option value="nomina">Nomina</option>
                   <option value="avance">Avance</option>
+                  <option value="Papeleria">Papeleria</option>
                 </select>
                 <h3 class="text-center p-4">Valor $</h3>           
                 <input type="number" min="0" class="col-md-12" required v-model="egresoEfectivo.valor">            
@@ -145,6 +150,7 @@ export default {
         descripcion: new String(),
       },
       spiner:false,
+      options:['Carpeta','Fotocopias','Comision','Documentacion','otros']
     }
   },
   methods : {
@@ -220,17 +226,24 @@ export default {
     },
     async guardarEgresoEfectivo(egreso){
       this.spiner = true
+      let h = new Date()
+      let hoy = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
       let data = {
         concepto:egreso.concepto,
         valor:parseInt(egreso.valor),
         descripcion:egreso.descripcion,
         codigoEmpleado:this.$auth.$state.user._id,
-        fechaEgreso:new Date(),
+        fechaEgreso:hoy,
         egreso:true,
       }
       const egresoOk = await this.$axios.$post('/contabilidad/guardarEgreso',data)
-      console.log(egresoOk)
       if(egresoOk.success) {
+        this.egreso = false
+        this.egresoEfectivo={
+          concepto: new String(),
+          valor:0,
+          descripcion: new String(),
+        }
         this.egreso = false
         this.cargarValoresCapital()
         this.cargarValoresInteres()
@@ -241,23 +254,29 @@ export default {
     async guardarIngresoEfectivo(a,ingreso){
       console.log(ingreso)
       this.spiner = true
+      let h = new Date()
+      let hoy = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
       let data = {
         concepto:a,
         capital:parseInt(ingreso.valor),
         interes:parseInt(ingreso.interes),
         descripcion:ingreso.descripcion,
         codigoEmpleado:this.$auth.$state.user._id,
-        fechaIngresoEfectivo:new Date(),
+        fechaIngresoEfectivo:hoy,
       }
       const ingresoOk = await this.$axios.$post('/contabilidad/guardarIngreso',data)
-      
       if(ingresoOk.success) {
         if(a==='otros'){
           this.ingreso = false
         }else{
           this.ingresoDineroCreditos = false
         }
-        
+        this.ingresoEfectivo={
+          valor:0,
+          interes:0,
+          descripcion: new String(),
+        }
+        this.ingreso =false
         this.cargarValoresCapital()
         this.cargarValoresInteres()
         this.cargarValoresEgresos()

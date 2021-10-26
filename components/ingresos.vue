@@ -20,6 +20,7 @@
       <ingresos-creditos-cuota-Incial />
       <ingresos-inversiones/>
       <ingresos-ventas-efectivo/>
+      <ingresos-otros/>
     </div>
   </div>
 </template>

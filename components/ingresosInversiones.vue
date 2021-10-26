@@ -10,22 +10,18 @@
                     <tr>
                         <th># Ingreso</th>
                         <th>Capital</th>
-                        <th>Interes</th>
-                        <th>Total</th>
-                        <th># Credito</th>
-                        <th>Nombre</th>
-                        <th>fecha de pago</th>
+                        <th>Fecha de ingreso</th>
+                        <th>Concepto</th>
+                        <th>Descripcion</th>
                     </tr>
                 </thead>
                     <tbody>
                         <tr v-for="(ingreso, index) in ingresos" :key="index">
                             <td>{{index + 1}}</td>
                             <td>{{new Intl.NumberFormat('es-CO').format(ingreso.capital)}}</td>
-                            <td>{{new Intl.NumberFormat('es-CO').format(ingreso.interes)}}</td>
-                            <td>{{new Intl.NumberFormat('es-CO').format(ingreso.capital + ingreso.interes)}}</td>
-                            <td>{{ingreso.numeroCredito}}</td>
-                            <td>{{ingreso.nombre}}</td>
                             <td>{{verFecha(ingreso.fechaIngresoEfectivo)}}</td>
+                            <td>{{ingreso.concepto}}</td>
+                            <td>{{ingreso.descripcion}}</td>
                         </tr>
                     </tbody>
             </table>

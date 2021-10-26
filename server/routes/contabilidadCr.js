@@ -234,7 +234,9 @@ router.post('/guardarEgreso', authe, async (req, res)=>{
     })
 })
 router.post('/HistorialCredito', authe, async (req, res)=>{
+    console.log(req.body.id)
     const ingreso = await Ingresos.find({idCredito:req.body.id})
+    console.log(ingreso)
     res.json(ingreso)
 }) 
 router.post('/pagoUltimaCuotaDisminucionCapital',authe, async (req, res)=>{
@@ -326,6 +328,30 @@ router.post('/ingresosComision',authe, async (req, res)=>{
             status:200
         })
     }
+})
+router.post('/ingresosOtros',authe, async (req, res)=>{
+    let page = (req.body.pagina-1)  
+    let pageSize = 20                   // Similar a 'límite'
+    const skip = (page) * pageSize;        // Para la página 1, el salto es: (0) * 20 => 0 * 20 = 0
+    const ingresos = await Ingresos.find({concepto:{$in:['Carpeta','Fotocopias','Documentacion']}}).sort({fechaIngresoEfectivo:-1}).skip(skip).limit(20)
+    if(ingresos){
+        return res.status(200).json({
+            ingresos,
+            success:true,
+            status:200
+        })
+    }
+})
+router.post('/totalIngresosOtros',authe, async (req, res)=>{
+    let total = await Ingresos.find({concepto:{$in:['Carpeta','Fotocopias','Documentacion']}}).countDocuments()
+    res.json(total)
+})
+router.post('/totalOtros',authe, async (req, res)=>{
+    let totalIngresosOtros = await Ingresos.aggregate([{$match: {concepto:{$in:['Carpeta','Fotocopias','Documentacion']}}},{$group:{_id:null,"valor":{$sum:"$capital"}}}])
+    let totalEgresosOtros = await Egresos.aggregate([{$match: {concepto:'Papeleria'}},{$group:{_id:null,"valo":{$sum:"$valor"}}}])
+    console.log(totalIngresosOtros)
+    console.log(totalEgresosOtros)
+    return res.status(200).json({a:totalIngresosOtros[0].valor,b:totalEgresosOtros[0].valo})
 })
 router.post('/totalIngresosComision',authe, async (req, res)=>{
     let total = await Ingresos.find({concepto:'Comision'}).countDocuments()
@@ -447,6 +473,23 @@ router.post('/egresosCompras',authe, async (req, res)=>{
             status:200
         })
     }
+})
+router.post('/egresosOtros',authe, async (req, res)=>{
+    let page = (req.body.pagina-1)  
+    let pageSize = 20                   // Similar a 'límite'
+    const skip = (page) * pageSize;        // Para la página 1, el salto es: (0) * 20 => 0 * 20 = 0
+    const egresos = await Egresos.find({concepto:'Papeleria'}).sort({fechaEgreso:-1}).skip(skip).limit(20)
+    if(egresos){
+        return res.status(200).json({
+            egresos,
+            success:true,
+            status:200
+        })
+    }
+})
+router.post('/totalEgresosOtros',authe, async (req, res)=>{
+    let total = await Egresos.find({concepto:'Papeleria'}).countDocuments()
+    res.json(total)
 })
 router.post('/totalEgresosCompras',authe, async (req, res)=>{
     let total = await Egresos.find({concepto:'compras'}).countDocuments()

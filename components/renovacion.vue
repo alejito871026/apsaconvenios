@@ -621,8 +621,9 @@ export default {
             return res.cantidad + 1
         },
         cargarInfo(frecuencia){
-            let hoy = new Date()
-            let pf = new Date()             
+            let h = new Date()
+            let hoy = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
+            let pf = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))             
             if(frecuencia==='Mensual' || frecuencia==='Pago Unico'){
                 pf = pf.setDate(pf.getDate()+8)
                 let rpf = new Date(pf)
@@ -647,7 +648,7 @@ export default {
             if(frecuencia==='Semanal'){
                 this.verHoy = false
                 let n = parseInt(this.credit.tiempo)
-                let r = new Date()
+                let r = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
                 let rr = r.setMonth(r.getMonth()+n)
                 this.hoy = this.verFecha(rr,1)
                 this.verHoyy = true
@@ -724,6 +725,8 @@ export default {
             }
         },
         async calcularCredito(creditoNew, creditoOld, valores){
+            let h = new Date()
+            let hoy = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
             let interesMensual = f.calcularInteresMensual(creditoNew.cantidad,creditoNew.interes)
             let valorTotalCredito= f.totalCredito(creditoNew.tiempo,creditoNew.cantidad,interesMensual)
             let respuesta = f.pagares(creditoNew.frecuencia,creditoNew.tiempo,creditoNew.cantidad,creditoNew.interes,interesMensual,this.date)
@@ -744,7 +747,7 @@ export default {
                 pagares : respuesta.pagares,
                 valTotalCred:valorTotalCredito,
                 valCuotaMens:respuesta.valorCuota,
-                fechaAgregado: new Date(),
+                fechaAgregado: hoy,
                 estadoInterno:'Aprobado',
                 Fp:respuesta.pagares[0].fecha,
                 aumentoPorDias:this.aumentoPorDias,

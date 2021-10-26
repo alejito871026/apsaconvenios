@@ -97,7 +97,7 @@
                                     </td>
                                     <td v-if="pags.estado">
                                         <div  class="btn btn-success">Cancelado</div>
-                                        <div  class="btn btn-success"  v-if="!pags.observacion" @click=" imprimirRecibo(pags,index)">imprimir</div>                                      
+                                        <div  class="btn btn-success"  v-if="!pags.observacion" @click=" imprimirRecibo(pags,index,'a')">imprimir</div>                                      
                                     </td>                                 
                                     <td v-else>
                                         <div   class="btn btn-info" v-if="pags.ultimoBtn  && credito.frecuencia != 'Pago Unico' && enMora === false && noMostrar === false" @click="modalFinal(pags.capital,pags.interes * .30,index, pags.interes)">
@@ -119,7 +119,7 @@
                                             </div>
                                             <div  class="btn btn-danger" @click="abonoFalse(index)">Cancelar abono</div>                                            
                                         </div>  
-                                        <div   class="btn btn-info" v-if="abonar[index].a==false">Recibo Prepago</div>
+                                        <div   class="btn btn-info" v-if="abonar[index].a==false" @click="imprimirRecibo(pags,index,'b')">Recibo Prepago</div>
                                         <div   class="btn btn-success" v-if="pags.pasarAlFinal" @click="modalMoverAlFinal(index,pags.interes)">Mover al final</div>
                                         <div   class="btn btn-success" disabled v-if="pags.pasarAlFinalMsg">{{pags.pasarAlFinalMsg}}</div>
                                     </td>                                                                      
@@ -212,7 +212,7 @@
                     </div>
                      <div class="card">
                         <div class="card-body">
-                            <div class="btn btn-block p-1 btn-outline-info" @click="historia(credito._id)"><h4>Historial de pagos</h4></div>
+                            <div class="btn btn-block p-1 btn-outline-info" @click="historia(credito._id)" v-if="botonH"><h4>Historial de pagos</h4></div>
                             <div class="btn btn-block p-1 btn-outline-success" @click="regresando()"><h2>Cerrar</h2></div>  
                         </div>
                         <div class="card-body" v-if="historial.length>0">
@@ -257,7 +257,7 @@
                                     </tr>
                                 </tbody>
                             </table>
-                            <div class="btn btn-block p-1 btn-outline-info" @click="historial=[]"><h4>Cerrar historial de pagos</h4></div>
+                            <div class="btn btn-block p-1 btn-outline-info" @click="historial=[],botonH=true"><h4>Cerrar historial de pagos</h4></div>
                         </div>
                     </div> 
                 </div>                               
@@ -512,6 +512,7 @@ export default {
             reciboImpresion : false,
             impresion:{},
             noMostrar : false,
+            botonH:false,
         }
     },
     methods: {
@@ -531,26 +532,47 @@ export default {
             ventana.focus();
             ventana.print();
         },
-        async imprimirRecibo(pago,index){
+        async imprimirRecibo(pago,index,a){
             console.log(pago)
             this.reciboImpresion = true
             if(index>=0){
-                this.impresion = {
-                    hora : this.horaPago(),
-                    numero : this.credito.numeroCredito,
-                    servicio : this.credito.servicio,
-                    nombre : this.credito.cliente.nombreCliente+' '+this.credito.cliente.primerApellidoCliente+' '+this.credito.cliente.segundoApellidoCliente,
-                    telefono : this.credito.cliente.celularUnoCliente,
-                    cajero: this.$auth.$state.user.nombreE+' '+this.$auth.$state.user.primerApellidoE+' '+this.$auth.$state.user.segundoApellidoE,
-                    tipoRecibo : 'Pago cuota',
-                    capital : pago.capital,
-                    interes : pago.interes,
-                    valApagar : pago.capital + pago.interes,
-                    fechaPago : pago.fechaPago,
-                    cuotaDe : (index+1)+' de '+this.credito.pagares.pagares.length
+                if(a=='a'){
+                    this.impresion = {
+                        hora : this.horaPago(),
+                        numero : this.credito.numeroCredito,
+                        servicio : this.credito.servicio,
+                        nombre : this.credito.cliente.nombreCliente+' '+this.credito.cliente.primerApellidoCliente+' '+this.credito.cliente.segundoApellidoCliente,
+                        telefono : this.credito.cliente.celularUnoCliente,
+                        cajero: this.$auth.$state.user.nombreE+' '+this.$auth.$state.user.primerApellidoE+' '+this.$auth.$state.user.segundoApellidoE,
+                        tipoRecibo : 'Pago cuota',
+                        capital : pago.capital,
+                        interes : pago.interes,
+                        valApagar : pago.capital + pago.interes,
+                        fechaPago : pago.fechaPago,
+                        cuotaDe : (index+1)+' de '+this.credito.pagares.pagares.length
+                    }
+                    if(pago.concepto==='Abono'){
+                        this.impresion.descripcion = pago.descripcion
+                    }
                 }
-                if(pago.concepto==='Abono'){
-                    this.impresion.descripcion = pago.descripcion
+                if(a=='b'){
+                    this.impresion = {
+                        hora : this.horaPago(),
+                        numero : this.credito.numeroCredito,
+                        servicio : this.credito.servicio,
+                        nombre : this.credito.cliente.nombreCliente+' '+this.credito.cliente.primerApellidoCliente+' '+this.credito.cliente.segundoApellidoCliente,
+                        telefono : this.credito.cliente.celularUnoCliente,
+                        cajero: this.$auth.$state.user.nombreE+' '+this.$auth.$state.user.primerApellidoE+' '+this.$auth.$state.user.segundoApellidoE,
+                        tipoRecibo : '-Pago cuota-',
+                        capital : pago.capital,
+                        interes : pago.interes,
+                        valApagar : pago.capital + pago.interes,
+                        fechaPago : new Date(),
+                        cuotaDe : (index+1)+' de '+this.credito.pagares.pagares.length
+                    }
+                    if(pago.concepto==='Abono'){
+                        this.impresion.descripcion = pago.descripcion
+                    }
                 }
             }else{
                 this.impresion = {
@@ -582,11 +604,13 @@ export default {
         async pagarTotalidad(capital,interes){
             this.spiner = true
             this.modalPagarTotalidadd=false
+            let h = new Date()
+            let hoy = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
             for (let a = 0; a < this.credito.pagares.pagares.length; a++) {
                 if(!this.credito.pagares.pagares[a].estado){
                     this.credito.pagares.pagares[a].estado = true
                     this.credito.pagares.pagares[a].observacion = 'Se cancelo mediante el metodo de pago completo del credito '
-                    this.credito.pagares.pagares[a].fechaPago = new Date()
+                    this.credito.pagares.pagares[a].fechaPago = hoy
                     this.credito.pagares.pagares[a].dias = 0
                 }                  
             }    
@@ -599,7 +623,7 @@ export default {
                 interes,
                 capital,
                 descripcion:'Cancelacion de credito mediante el pago completo del capital adeudado '+capital+' '+interes+' = '+capital+interes,
-                fechaIngresoEfectivo : new Date(),
+                fechaIngresoEfectivo : hoy,
                 codigoEmpleado : this.$auth.$state.user._id,
 
             }
@@ -644,11 +668,13 @@ export default {
             }
         },
         async pagoUltimaCuotaDisminucionCapital(capital,interes,index,oldInteres){
+            let h = new Date()
+    let hoy = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
             this.spiner = true
             this.modalFinall=false
             this.credito.pagares.pagares[index].estado = true
             this.credito.pagares.pagares[index].observacion = 'Se cancelo mediante el metodo de abono a capital con disminucion de tiempo aplicado a la ultima cuota'
-            this.credito.pagares.pagares[index].fechaPago = new Date()
+            this.credito.pagares.pagares[index].fechaPago = hoy
             this.credito.pagares.pagares[index].dias = 0
             this.credito.pagares.pagares[index].interes = interes
             let data = {
@@ -661,7 +687,7 @@ export default {
                 capital,
                 descripcion:'Se cancelo mediante el metodo de abono a capital con disminucion de tiempo aplicado a la ultima cuota',
                 index,
-                fechaIngresoEfectivo : new Date(),
+                fechaIngresoEfectivo : hoy,
                 codigoEmpleado : this.$auth.$state.user._id,
                 oldInteres
             }
@@ -704,6 +730,8 @@ export default {
             }
         },
         async moverAlFinal(index,interes){
+            let h = new Date()
+    let hoy = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
             this.spiner = true
             let b = 0
             let length = this.credito.pagares.pagares.length
@@ -754,7 +782,7 @@ export default {
                 numeroCredito:this.credito.numeroCredito,
                 interes,
                 index,
-                fechaIngresoEfectivo : new Date(),
+                fechaIngresoEfectivo : hoy,
                 codigoEmpleado : this.$auth.$state.user._id,
             }
             const actualizarPagaresOk = await this.$axios.$post('/creditos/cambiarPagares',datos)
@@ -978,6 +1006,7 @@ export default {
             }       
         },
         async historia(id){
+            this.botonH = false
             this.historial = await this.$axios.$post('/contabilidad/HistorialCredito',{id})
         },
         verFecha(fecha){
@@ -1078,6 +1107,8 @@ export default {
             }                    
         },
         async pagarCuota(info) {
+            let h = new Date()
+    let hoy = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
             console.log(info)
             this.spiner = true
             let valores = {}
@@ -1092,7 +1123,7 @@ export default {
                     nombre:info.nombre,
                     descripcion: 'ingreso pago ultima cuota credito #'+this.credito.numeroCredito,
                     codigoEmpleado : this.$auth.$state.user._id,
-                    fechaIngresoEfectivo : new Date(),
+                    fechaIngresoEfectivo : hoy,
                     idCredito:info.idCredito,
                     idPagares:this.credito.pagares._id,
                     enMora:false,
@@ -1133,7 +1164,7 @@ export default {
                     nombre:info.nombre,
                     descripcion: 'ingreso pago cuota # '+(info.index+1)+' del credito #'+this.credito.numeroCredito,
                     codigoEmpleado : this.$auth.$state.user._id,
-                    fechaIngresoEfectivo : new Date(),
+                    fechaIngresoEfectivo : hoy,
                     idCredito:info.idCredito,
                     idPagares:this.credito.pagares._id,
                     proximaFp:info.pagares[info.index+1].fecha,
@@ -1173,8 +1204,6 @@ export default {
             this.abonar[index].a = false
         },
         async guardarAbono(valAbono, index, idPagares,idCredito,numeroCredito,pags){
-            console.log(pags)
-            console.log(valAbono)
             let capital = 0
             let interes = 0
             let abono = pags.abono
@@ -1202,7 +1231,9 @@ export default {
                         descripcion= '3ingreso abono a cuota # '+(index+1)+' del credito #'+this.credito.numeroCredito
                         capital = valAbono
                         interes = 0
-                    }                    
+                    }    
+                    let h = new Date()
+                    let hoy = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))                
                     let valores = {
                         numeroCredito,
                         capital,
@@ -1212,7 +1243,7 @@ export default {
                         nombre:this.credito.cliente.nombreCliente+' '+this.credito.cliente.primerApellidoCliente+' '+this.credito.cliente.segundoApellidoCliente,
                         descripcion : descripcion,
                         codigoEmpleado : this.$auth.$state.user._id,
-                        fechaIngresoEfectivo : new Date(),
+                        fechaIngresoEfectivo : hoy,
                         idCredito,
                         idPagares,
                         index,
@@ -1244,6 +1275,8 @@ export default {
             this.modalAbonoCapital = true
         },
         async guardarAbonoCapital(abono, abonoMinimo,abonoMaximo, n,id){
+            let h = new Date()
+    let hoy = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
             abono = parseInt(abono)
             if (abono) {
                 if(abono<abonoMinimo){
@@ -1262,7 +1295,7 @@ export default {
                                 if(y<=abono){
                                     let restante = abono - y
                                     pagares[a].estado = true
-                                    pagares[a].fechaPago = new Date()
+                                    pagares[a].fechaPago = hoy
                                     pagares[a].interes = 0
                                     pagares[a].observacion = 'cancelado mediante abono a capital con reduccion de tiempo'
                                     if(restante<pagares[a-1].capital){
@@ -1292,7 +1325,7 @@ export default {
                             numeroCredito : this.credito.numeroCredito, 
                             descripcion: 'ingreso abono a capital con reduccion de tiempo al credito '+this.credito.numeroCredito,
                             codigoEmpleado : this.$auth.$state.user._id,
-                            fechaIngresoEfectivo : new Date(),
+                            fechaIngresoEfectivo : hoy,
                             idCredito:this.credito._id,
                             idPagares:this.credito.pagares._id,
                             pagares,
@@ -1344,7 +1377,7 @@ export default {
                             numeroCredito : this.credito.numeroCredito, 
                             descripcion: 'ingreso abono a capital con reduccion en valor de cuota al credito # '+this.credito.numeroCredito,
                             codigoEmpleado : this.$auth.$state.user._id,
-                            fechaIngresoEfectivo : new Date(),
+                            fechaIngresoEfectivo : hoy,
                             idCredito:this.credito._id,
                             idPagares:this.credito.pagares._id,
                             pagares,

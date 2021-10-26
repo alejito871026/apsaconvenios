@@ -273,7 +273,7 @@
                             </div>
                         </div>
                         <div class="input-group mb-3 p-3" v-if="solicitudActiva.fiador.emailFiador">
-                            <span class="input-group-text">Personas a cargo</span>
+                            <span class="input-group-text">Email</span>
                             <div class="form-control">{{solicitudActiva.fiador.emailFiador}}</div>                        
                         </div>
                         <h2 class="p-2 mx-auto">Informacion laboral fiador</h2>
@@ -357,12 +357,101 @@
                 </div>
                 <div class="border border-primary p-1" v-if="solicitudActiva.prenda">
                     <h2 class="p-2">Prenda</h2>
-                    {{solicitudActiva.prenda}}
+                    <div class="row">                    
+                        <div class="col-md-6">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Tipo vehiculo</span>
+                                <div class="form-control">{{solicitudActiva.prenda.tipoVehiculo}}</div>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Marca</span>
+                                <div class="form-control">{{solicitudActiva.prenda.marca}}</div>
+                            </div>                        
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Modelo</span>
+                                <div class="form-control">{{solicitudActiva.prenda.modelo}}</div>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Tipo</span>
+                                <div class="form-control">{{solicitudActiva.prenda.tipo}}</div>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Cilindraje</span>
+                                <div class="form-control">{{solicitudActiva.prenda.cilindraje}}</div>                        
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Placa</span>
+                                <div class="form-control">{{solicitudActiva.prenda.placa}}</div>                        
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Servicio</span>
+                                <div class="form-control">{{solicitudActiva.prenda.servicio}}</div>                        
+                            </div>                            
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Nombre propietario</span>
+                                <div class="form-control">{{solicitudActiva.prenda.nombrePropietario}}</div>                        
+                            </div>
+                        </div>
+                        <div class="col-md-6">  
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Color</span>
+                                <div class="form-control">{{solicitudActiva.prenda.color}}</div>
+                            </div>  
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Licencia transito</span>
+                                <div class="form-control">{{solicitudActiva.prenda.licTransito}}</div>                        
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Manifiesto</span>
+                                <div class="form-control">{{solicitudActiva.prenda.manifiesto}}</div>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Motor</span>
+                                <div class="form-control">{{solicitudActiva.prenda.motor}}</div>                        
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Chasis</span>
+                                <div class="form-control">{{solicitudActiva.prenda.chasis}}</div>                        
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Seguro</span>
+                                <div class="form-control">{{solicitudActiva.prenda.seguro}}</div>                        
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Tecnomecanica</span>
+                                <div class="form-control">{{solicitudActiva.prenda.tecnicomecanica}}</div>                        
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Cedula propietario</span>
+                                <div class="form-control">{{solicitudActiva.prenda.ccPropietario}}</div>                        
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 mx-auto">
+                        <h3>Validacion informacion prenda</h3>
+                        <div v-if="solicitudActiva.prenda.validadoInfoPrenda">
+                            <div class="btn btn-outline-warning">Ya se a guardado la validacion, desea editarla?</div>
+                        </div>
+                        <div v-else>
+                            <div class="form-group ">                    
+                                <input type="checkbox" class="form-check-input" id="desPago1" v-model="informacionPrenda.pignoracionOk">
+                                <label class="form-check-label" for="desPago1">Documento de pignoracion</label> &ensp;&ensp;&ensp;
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Observacion</span>
+                                <textarea class="form-control" v-model="informacionPrenda.Objecion"></textarea>                        
+                            </div>
+                            <div class="btn btn-block btn-outline-success" @click="guardarValidacionInfoPrenda(informacionPrenda,solicitudActiva.prenda._id)">Guardar validacion informacion cliente</div>
+                        </div>  
+                        <br>  
+                    </div>
                 </div>
-                <div class="border border-primary p-1">
-                    <h2 class="p-2">Referencias</h2>
+                    
+                </div>
+                <div class="p-2">
+                    <h2 class="p-3 text-center">Referencias</h2>
                     <div class="row">
-                        <div v-for="referencia, index in solicitudActiva.referidos.referidos" :key="index" class="col-md-6">
+                        <div v-for="referencia, index in solicitudActiva.referidos.referidos" :key="index" class="col-md-6 text-center">
                             <h4 class="p-2">referencia {{index+1}}</h4>
                             <div class="input-group mb-3">
                                 <span class="input-group-text">Nombre</span>
@@ -425,7 +514,7 @@ export default {
                     return true
                 }
             }else if(this.solicitudActiva.prenda){
-                if(this.solicitudActiva.referidos.validados && this.solicitudActiva.infoLab.validadoInfoLaboral && this.solicitudActiva.infoLab.validadoInfoCliente){
+                if(this.solicitudActiva.referidos.validados && this.solicitudActiva.infoLab.validadoInfoLaboral && this.solicitudActiva.infoLab.validadoInfoCliente && this.solicitudActiva.prenda.validadoInfoPrenda){
                     return true
                 }
             }else{
@@ -449,6 +538,7 @@ export default {
             informacionCliente:{},
             informacionLaboralCliente:{},
             informacionFiador:{},
+            informacionPrenda:{},
             actRef:false
         }
     },
@@ -572,6 +662,18 @@ export default {
             }
             const infoClienteOk = await this.$axios.$post('/creditos/guardarInfoFiador', data)
             if(infoClienteOk.success){
+                this.buscarSolicitud(this.solicitud)
+            }
+        },
+        async guardarValidacionInfoPrenda(infoPrenda,id){
+            infoPrenda.validadoPor = this.$auth.$state.user._id
+            let data = {
+                infoPrenda,
+                id,
+                validadoInfoPrenda:true
+            }
+            const infoPrendaOk = await this.$axios.$post('/creditos/guardarInfoPrenda', data)
+            if(infoPrendaOk.success){
                 this.buscarSolicitud(this.solicitud)
             }
         },

@@ -7,7 +7,7 @@ const CreditoSquema = new Schema({
     nombreCliente:{type:String},
     cedulaCliente:{type:String},
     servicio: { type: String, required:[true,'servicio obligatorio']},//el servicio por el que se hizo el credito
-    producto: {type: String,default:null},//guardara el id del producto en caso de uqe sea por un producto, el cual ya estara guardado en la bd 
+    producto: {type: Schema.Types.ObjectId, ref:'product',default:null},//guardara el id del producto en caso de uqe sea por un producto, el cual ya estara guardado en la bd 
     cantidad:{ type : Number,required:[true,'Cantidad obligatorio']},//es el valor del credito sin interes
     interes:{ type : Number, required:[true,'interes obligatorio']},//es el porcentaje del interes al que se realizara el credito
     cuotaInicial:{ type : Number},    

@@ -162,6 +162,31 @@
                 </tbody>
             </table>
         </div>
+        <div>
+            <div class="bg-primary text-white text-center p-4">
+                <h1><strong>CREDITOS NEGADOS</strong></h1>
+            </div>
+            <table class="table table-hover table-sm text-center mx-auto">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Cliente</th>
+                        <th>Telefonos</th>
+                        <th>Direccion</th>
+                        <th>Servicio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="credito in negados" :key="credito._id" @click="verCredito({_id:credito._id})">
+                        <td>{{credito.numeroCredito}}</td>
+                        <td>{{credito.nombreCliente}}</td>
+                        <td>{{credito.cliente.celularUnoCliente}} <a v-if="credito.cliente.celularDosCliente">--- {{credito.cliente.celularDosCliente}}</a></td>
+                        <td>{{credito.cliente.direccionCliente}}</td>
+                        <td>{{credito.servicio}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </template>
 
@@ -184,10 +209,13 @@ export default {
             verCreditoo: false,
             credito:{},
             historiall:[],
+            negaDos:[],
+            negados:[],
         }
     },
     created(){
         this.cargarCreditosTerminados()
+        this.cargarCreditosNegados()
     },
     methods: {
         async verCredito(_id) {
@@ -197,6 +225,10 @@ export default {
         async cargarCreditosTerminados() {
             this.terminaDos = await this.$axios.$get('/creditos/terminados')
             this.terminados = this.terminaDos
+        },
+        async cargarCreditosNegados() {
+            this.negaDos = await this.$axios.$get('/creditos/negados')
+            this.negados = this.negaDos
         },
         cerrarVerCredito(){
             this.credito = {}

@@ -248,8 +248,10 @@ export default {
             console.log(this.creditoAnterior)
         },
         async pagarCreditoAnterior(valores){
+            let h = new Date()
+            let hoy = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
             valores.pagaresId = this.creditoAnterior.pagares
-            valores.fechaIngresoEfectivo =  new Date()
+            valores.fechaIngresoEfectivo =  hoy
             valores.codigoEmpleado = this.$auth.$state.user._id
             console.log(valores)
             const pagarOk = await this.$axios.$post('/creditos/pagarCreditoAnterior',valores)
@@ -294,13 +296,15 @@ export default {
             return y         
         },
         async ingresoInicialCredito(idCredito,cuotaInicial,idEmpleadosCreditos){
+            let h = new Date()
+            let hoy = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
             let valores = {
                 concepto: 'inicial',
                 capital:cuotaInicial,
                 descripcion:'cuota inicial',
                 idCredito : idCredito,
                 codigoEmpleado : this.$auth.$state.user._id,
-                fechaIngresoEfectivo:new Date(),
+                fechaIngresoEfectivo:hoy,
                 idEmpleadosCreditos
             }
             const ingresoOk = await this.$axios.$post("/contabilidad/guardarIngreso", valores)
@@ -314,6 +318,8 @@ export default {
             }
         },
         async entregado(producto,id,valor,cn,cs,cuotainicial,credito){
+            let h = new Date()
+    let hoy = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
             if(this.impreso==false){
                 alert('no se imprimio') 
                 return  
@@ -322,18 +328,15 @@ export default {
                 id,
                 estadoInterno:'Entregado',
                 entregadoPor : this.$auth.$state.user._id,
-                fechaEntregado : new Date()                     
+                fechaEntregado : hoy                   
             }
             const entregadoOk = await this.$axios.$post("/creditos/cambiarEstadoInterno", entregado)
-            console.log(entregadoOk)
-
             if(entregadoOk.success){
+                this.spiner=false
                 this.guardarPrimeraVezTotales(id,valor) 
                 this.guardar
                 if(producto == null){
                     this.egresoDesembolso(id,valor,cn,cs,cuotainicial)
-                }else{
-                    this.entregarProducto(producto)
                 }
                 this.verCredit = false
             }           
@@ -361,12 +364,14 @@ export default {
             }
         },
         async egresoDesembolso(id,n,cn,cs,cuotainicial){
+            let h = new Date()
+    let hoy = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
             console.log(cs)
             let f_o_v = false
             let fre
             if(cs == 'Libre Inversion' || cs == 'pignoracion' || cs == 'Hipoteca' || cs == 'Vacaciones' || cs == 'compraVehiculo'){
                 f_o_v = true
-                fre = new Date()
+                fre = hoy
             } else {
                 f_o_v = false
                 fre =''
@@ -379,7 +384,7 @@ export default {
                 idCredito:id,
                 cuotaInicial:cuotainicial,
                 numCredito:cn,
-                fechaEgreso: new Date(),   
+                fechaEgreso: hoy,   
                 egreso : f_o_v ,
                 codigoEmpleadoReflejadoEgreso: '',  
                 fechaReflejadoEgreso: fre,

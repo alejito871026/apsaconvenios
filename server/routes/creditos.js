@@ -11,7 +11,9 @@ const empleadosCreditos = require('../models/empleadosCreditos');
 const Cliente = require('../models/Clientes.js');
 const authe = require('../middlewareServer/authenticacion.js');
 const valoresCredito = require('../models/valoresEstadoCredito.js');
+const Egresos = require('../models/Egresos');
 const Ingresos = require('../models/Ingresos');
+const Producto = require('../models/product.js');
 
 router.post('/creditosApagar',authe, async (req, res)=>{
     let start = new Date(req.body.funo)
@@ -31,7 +33,8 @@ router.post('/verValoresCredito',authe, async (req, res)=>{
     res.json(valores)
 })
 router.post('/actualizarMora', authe, async (req, res)=>{
-    let fecha = new Date();
+    let h = new Date()
+    let fecha = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
     try {
         const creditosActivos = await Creditos.find({estado:"activo", estadoInterno:"Entregado"})
         for(let i = 0; i < creditosActivos.length; i++){
@@ -107,6 +110,8 @@ router.post('/contarCreditos', async (req, res) => {
     })
 })
 router.post('/guardarCredito', async (req, res) => {
+    let h = new Date()
+    new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
     console.log(req.body)
     let credito = {} 
     credito.cliente = req.body.cliente 
@@ -122,16 +127,21 @@ router.post('/guardarCredito', async (req, res) => {
     credito.nombreCliente = req.body.nombreCliente
     credito.cedulaCliente = req.body.cedulaCliente
     let pagos = await guardarPagares(req.body.valores.pagares)
-    console.log('pagos')
-    console.log(pagos)
     credito.pagares = pagos._id
     credito.valTotalCred = req.body.valores.valorTotalCredito
     credito.valCuotaMens = req.body.valores.valorCuota
-    credito.fechaAgregado = new Date()
-    if(req.body.fiador){ 
-        let fiador = await guardarFiador(1,req.body.fiador)
-        credito.fiador = fiador._id
-    } 
+    credito.fechaAgregado = hoy
+    if(req.body.credito.producto){
+        credito.producto = req.body.credito.producto
+    }
+    if(req.body.fiador){
+        if(req.body.fiador._id){ 
+            credito.fiador = req.body.fiador._id
+        } else {
+            let fiador = await guardarFiador(1,req.body.fiador)
+            credito.fiador = fiador._id
+        }
+    }
     if(req.body.prenda){
         let prenda = await guardarFiador(2,req.body.prenda)
         credito.prenda = prenda._id
@@ -251,12 +261,16 @@ router.get('/terminados', authe, async (req, res)=>{
     const terminados = await Creditos.find({estado:"terminado", estadoInterno:"terminado"}).populate('cliente')
     res.json(terminados)
 })
+router.get('/negados', authe, async (req, res)=>{
+    const terminados = await Creditos.find({estado:"terminado", estadoInterno:"Negado"}).populate('cliente')
+    res.json(terminados)
+})
 router.get('/primeraInstancia', authe, async (req, res)=>{
-    const solicitudes = await Creditos.find({estado:"activo", estadoInterno:"primeraEstancia"}).populate('cliente').populate('infoLab').populate('referidos').populate('fiador').populate('prenda')
+    const solicitudes = await Creditos.find({estado:"activo", estadoInterno:"primeraEstancia"}).populate('cliente').populate('infoLab').populate('referidos').populate('fiador').populate('prenda').populate('producto')
     res.json(solicitudes)
 })
 router.get('/aprobados', authe, async (req, res)=>{
-    const solicitudes = await Creditos.find({estado:"activo", estadoInterno:"Aprobado"}).populate('cliente').populate('pagares')
+    const solicitudes = await Creditos.find({estado:"activo", estadoInterno:"Aprobado"}).populate('cliente').populate('pagares').populate('producto')
     res.json(solicitudes)
 })
 router.post('/solicitudUnica', authe, async (req, res)=>{
@@ -293,6 +307,10 @@ router.post('/guardarInfoLabCliente', authe, async (req, res)=>{
 })
 router.post('/guardarInfoFiador', authe, async (req, res)=>{
     const infoOk = await fiador.updateOne({_id:req.body.id},{$set:{infoFiador:req.body.infoFiador,validadoInfoFiador:req.body.validadoInfoFiador}})
+    res.status(200).json({data:infoOk._id,success:true})
+})
+router.post('/guardarInfoPrenda', authe, async (req, res)=>{
+    const infoOk = await prenda.updateOne({_id:req.body.id},{$set:{infoPrenda:req.body.infoPrenda,validadoInfoPrenda:req.body.validadoInfoPrenda}})
     res.status(200).json({data:infoOk._id,success:true})
 })
 router.post('/cambiarEstadoInterno', authe, async (req, res)=>{
@@ -389,6 +407,199 @@ router.post('/verCreditoUnicoRenovacion', authe, async (req, res)=>{
     const credito = await Creditos.findById(req.body._id).populate('cliente').populate('pagares').populate('referidos').populate('fiador').populate('prenda').populate('infoLab')
     res.json(credito)
 })
+router.get('/creditosProductos', authe, async (req, res)=>{
+    let creditos = await Creditos.find({ estado:"activo", estadoInterno:{$in:["cotizacion","Aprobado","primeraEstancia","Entregado","noAprobado","Negado","terminado"]},producto:{ $nin:null}}).populate('producto')
+    res.json(creditos)
+})
+
+router.post('/ingCapFechas', authe,async (req, res)=>{
+    let start = new Date(req.body.fUno)  
+    if(req.body.fDos!=''){
+        let end = new Date(req.body.fDos)
+        var ingCapFechas= await Ingresos.find({concepto:{$in:["cuota credito","Abono","Abono a capital","Pago total","cuota credito al final","cuota credito disminucion capital"]}, fechaIngresoEfectivo:{"$gte" : start,"$lte" : end}})
+        res.json(ingCapFechas)   
+    }else{
+        let fin = new Date(req.body.fUno)
+        fin.setDate(fin.getDate()+1)
+        var ingCapFechas= await Ingresos.find({concepto:{$in:["cuota credito","Abono","Abono a capital","Pago total","cuota credito al final","cuota credito disminucion capital"]},fechaIngresoEfectivo:{"$gt" : start,"$lt" : fin}})
+        res.json(ingCapFechas) 
+    }     
+}) 
+router.post('/ingIntMora', authe,async (req, res)=>{
+    let start = new Date(req.body.fUno)
+    if(req.body.fDos!=''){
+        let end = new Date(req.body.fDos)
+        var ingIntMora= await Ingresos.find({"concepto":"Interes Mora","fechaIngresoEfectivo":{"$gte" : start,"$lte" : end}})
+        res.json( ingIntMora) 
+    }else{
+        let fin = new Date(req.body.fUno)
+        fin.setDate(fin.getDate()+1)
+        var ingIntMora= await Ingresos.find({"concepto":"Interes Mora","fechaIngresoEfectivo":{"$gt" : start,"$lt" : fin}})
+        res.json( ingIntMora) 
+    }
+})
+router.post('/ingVenEfecFechas', authe,async (req, res)=>{
+    let start = new Date(req.body.fUno)
+    if(req.body.fDos!=''){
+        let end = new Date(req.body.fDos)
+        var ingVentEfectFechas= await Ingresos.find({"concepto":"ventaEfectivo","fechaIngresoEfectivo":{"$gte" : start,"$lte" : end}})
+        res.json(ingVentEfectFechas)
+    }else{
+        let fin = new Date(req.body.fUno)
+        fin.setDate(fin.getDate()+1)
+        var ingVentEfectFechas= await Ingresos.find({"concepto":"ventaEfectivo","fechaIngresoEfectivo":{"$gt" : start,"$lt" : fin}})
+        res.json(ingVentEfectFechas)
+    }         
+})
+router.post('/ingInverFechas', authe,async (req, res)=>{
+    let start = new Date(req.body.fUno)
+    if(req.body.fDos!=''){
+        let end = new Date(req.body.fDos)
+        var ingInvFechas= await Ingresos.find({"concepto":"otros","fechaIngresoEfectivo":{"$gte" : start,"$lte" : end}})
+        res.json(ingInvFechas) 
+    }else{
+        let fin = new Date(req.body.fUno)
+        fin.setDate(fin.getDate()+1)
+        var ingInvFechas= await Ingresos.find({"concepto":"otros","fechaIngresoEfectivo":{"$gt" : start,"$lt" : fin}})
+        res.json(ingInvFechas) 
+    }
+})
+router.post('/ingComision', authe,async (req, res)=>{
+    let start = new Date(req.body.fUno)
+    if(req.body.fDos!=''){
+        let end = new Date(req.body.fDos)
+        var ingComisionFechas= await Ingresos.find({"concepto":"Comision","fechaIngresoEfectivo":{"$gte" : start,"$lte" : end}})
+        res.json(ingComisionFechas) 
+    }else{
+        let fin = new Date(req.body.fUno)
+        fin.setDate(fin.getDate()+1)
+        var ingComisionFechas= await Ingresos.find({"concepto":"Comision","fechaIngresoEfectivo":{"$gt" : start,"$lt" : fin}})
+        res.json(ingComisionFechas) 
+    }
+})
+router.post('/ingPapeleria', authe,async (req, res)=>{
+    let start = new Date(req.body.fUno)
+    if(req.body.fDos!=''){
+        let end = new Date(req.body.fDos)
+        var ingComisionFechas= await Ingresos.find({concepto:{$in:['Carpeta','Fotocopias','Documentacion']},fechaIngresoEfectivo:{"$gte" : start,"$lte" : end}})
+        res.json(ingComisionFechas) 
+    }else{
+        let fin = new Date(req.body.fUno)
+        fin.setDate(fin.getDate()+1)
+        var ingComisionFechas= await Ingresos.find({concepto:{$in:['Carpeta','Fotocopias','Documentacion']},fechaIngresoEfectivo:{"$gt" : start,"$lt" : fin}})
+        res.json(ingComisionFechas) 
+    }
+})
+router.post('/ingInicial', authe,async (req, res)=>{
+    let start = new Date(req.body.fUno)
+    if(req.body.fDos!=''){
+        let end = new Date(req.body.fDos)
+        var ingInicialFechas= await Ingresos.find({"concepto":"inicial","fechaIngresoEfectivo":{"$gte" : start,"$lte" : end}})
+        res.json(ingInicialFechas) 
+    }else{
+        let fin = new Date(req.body.fUno)
+        fin.setDate(fin.getDate()+1)
+        var ingInicialFechas= await Ingresos.find({"concepto":"inicial","fechaIngresoEfectivo":{"$gt" : start,"$lt" : fin}})
+        res.json(ingInicialFechas) 
+    }
+})
+//estas pertenencen a los egresos 
+router.post('/egresoNomina', authe,async (req, res)=>{
+    let start = new Date(req.body.fUno)
+    if(req.body.fDos!=''){
+        let end = new Date(req.body.fDos)
+        var egresoNomina= await Egresos.find({concepto:"nomina",fechaEgreso:{"$gte" : start,"$lte" : end}})
+        res.json(egresoNomina)
+    }else{
+        let fin = new Date(req.body.fUno)
+        fin.setDate(fin.getDate()+1)
+        var egresoNomina= await Egresos.find({concepto:"nomina",fechaEgreso:{"$gt" :start,"$lt" : fin}})
+        res.json(egresoNomina)
+    } 
+})  
+router.post('/egresoAvance', authe,async (req, res)=>{
+    let start = new Date(req.body.fUno)
+    if(req.body.fDos!=''){
+        let end = new Date(req.body.fDos)
+        var egresoAvance= await Egresos.find({concepto:"avance",fechaEgreso:{"$gte" : start,"$lte" : end}})
+        res.json(egresoAvance)
+    }else{
+        let fin = new Date(req.body.fUno)
+        fin.setDate(fin.getDate()+1)
+        var egresoAvance= await Egresos.find({concepto:"avance",fechaEgreso:{"$gt" :start,"$lt" : fin}})
+        res.json(egresoAvance)
+    }
+})
+router.post('/egresoFuncionamiento', authe,async (req, res)=>{
+    let start = new Date(req.body.fUno)
+    if(req.body.fDos!=''){
+        let end = new Date(req.body.fDos)
+        var egresoFuncionamiento= await Egresos.find({concepto:"funcionamiento",fechaEgreso:{"$gte" : start,"$lte" : end}})
+        res.json(egresoFuncionamiento) 
+    }else{
+        let fin = new Date(req.body.fUno)
+        fin.setDate(fin.getDate()+1)
+        var egresoFuncionamiento= await Egresos.find({concepto:"funcionamiento",fechaEgreso:{"$gt" :start,"$lt" : fin}})
+        res.json(egresoFuncionamiento)
+    }
+})
+router.post('/egresoCompras', authe,async (req, res)=>{
+    let start = new Date(req.body.fUno)
+    if(req.body.fDos!=''){
+        let end = new Date(req.body.fDos)
+        var egresoCompras= await Egresos.find({concepto:"compras",fechaEgreso:{"$gte" : start,"$lte" : end}})
+        res.json(egresoCompras) 
+    }else{
+        let fin = new Date(req.body.fUno)
+        fin.setDate(fin.getDate()+1)
+        var egresoCompras= await Egresos.find({concepto:"compras",fechaEgreso:{"$gt" :start,"$lt" : fin}})
+        res.json(egresoCompras)
+    }
+}) 
+router.post('/egresoComprasPapeleria', authe,async (req, res)=>{
+    let start = new Date(req.body.fUno)
+    if(req.body.fDos!=''){
+        let end = new Date(req.body.fDos)
+        var egresoCompras= await Egresos.find({concepto:"Papeleria",fechaEgreso:{"$gte" : start,"$lte" : end}})
+        res.json(egresoCompras) 
+    }else{
+        let fin = new Date(req.body.fUno)
+        fin.setDate(fin.getDate()+1)
+        var egresoCompras= await Egresos.find({concepto:"Papeleria",fechaEgreso:{"$gt" :start,"$lt" : fin}})
+        res.json(egresoCompras)
+    }
+})             
+router.post('/egresosDesembolsos', authe,async (req, res)=>{
+    let start = new Date(req.body.fUno)
+    if(req.body.fDos!=''){
+        let end = new Date(req.body.fDos)
+        var egresosDesembolsos = await Egresos.find({concepto:"desembolso",egreso:true, fechaReflejadoEgreso:{"$gte" : start,"$lte" : end}})
+        res.json(egresosDesembolsos) 
+    }else{
+        let fin = new Date(req.body.fUno)
+        fin.setDate(fin.getDate()+1)
+        var egresosDesembolsos = await Egresos.find({concepto:"desembolso",egreso:true, fechaReflejadoEgreso:{"$gt" :start,"$lt" : fin}})
+        res.json(egresosDesembolsos)
+    }
+})     
+router.post('/diaAdia', authe,async (req, res)=>{
+    let h = new Date()
+    let hoy = new Date(h.getFullYear(),(h.getMonth()),h.getDate(),-5,00,00)
+    console.log(hoy)
+    const creditos = await Creditos.find({fechaAgregado:{$gte:hoy}})
+    const ingresos = await Ingresos.find({fechaIngresoEfectivo:{$gte:hoy}})
+    const egresos = await Egresos.find({fechaEgreso:{$gte:hoy}})
+    const productos= await Producto.find({fechaCompra:{$gte:hoy}})
+    let respuesta = {
+        creditos,
+        ingresos,
+        egresos,
+        productos,
+    }
+    console.log(respuesta)
+    res.json(respuesta)     
+}) 
+
 module.exports = router;
 async function guardarReferidos(referidos) {
     let r = {}
@@ -412,6 +623,7 @@ async function guardarInfoLaboral(info){
         }
         return data
 }
+//se debe arganizar el guardado del id del fiador cuando ya existe alguno 
 async function guardarFiador(n,info){
     if(n===1){
         let Info = new fiador(info)
@@ -462,8 +674,9 @@ async function numeroCredito(){
     return cantidad + 1
 }
 async function creditos (){ 
-    let start = new Date()
-    let end = new Date()
+    let h = new Date()
+    let start = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
+    let end = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
     start.setDate(end.getDate()-1)
     end.setDate(end.getDate()+1)
     console.log(start)

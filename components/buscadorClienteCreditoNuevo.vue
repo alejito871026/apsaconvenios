@@ -10,7 +10,7 @@
                     </div>
                     <div class="form-group">
                     <div>
-                        <input autofocus @keyup.delete="recargar()" @keyup="buscando()"  v-model="persona.cedulaId"  type="text" class="col-lg-12 form-group"/>
+                        <input autofocus  @keyup="buscando()"  v-model="persona.cedulaId"  type="text" class="col-lg-12 form-group"/>
                     </div>
                     </div>
                     <div v-if="si_existe">
@@ -176,6 +176,9 @@ export default {
                 this.es_una_palabra = false;
                 this.no_existe = false;
                 this.si_existe = false;
+                this.persona.cedulaId = ''
+                this.regreso()
+                this.cedula = null
             } else {
                 if (isNaN(x.cedulaId)) {
                     this.es_una_palabra = true;
@@ -318,9 +321,7 @@ export default {
             }
         },
         recargar(){
-            this.persona.cedulaId = ''
-            this.regreso()
-            this.cedula = null
+            
         },
         agregar(){
             this.estadoCrearCliente(true)

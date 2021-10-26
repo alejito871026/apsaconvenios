@@ -33,7 +33,7 @@ export default {
     },
     time(){
       let tim = new Date();
-      this.hora =  tim.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true })
+      this.hora =  tim.toLocaleString('es-CO', { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true })
     },
   }
 }

@@ -111,8 +111,10 @@ export default {
                 alert('todos los campos son obligatorios')
                 return
             }else{ 
+                let h = new Date()
+                let hoy = new Date(h.getFullYear()+'/'+(h.getMonth()+1)+'/'+(h.getDate()))
                 let emple = this.empleado
-                emple.fechaAgregado =  new Date()
+                emple.fechaAgregado =  hoy
                 emple.fechaNacE = this.empleado.fechaNacE
                 let res  = await this.$axios.$post("empleados/registro",emple)
                     if(res.status===205){

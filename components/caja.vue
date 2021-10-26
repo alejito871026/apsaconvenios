@@ -15,6 +15,7 @@
         <ingresos/>
         <egresos/>
         <cartera/>
+        <dia-adia/>
     </div>
 </template>
 
