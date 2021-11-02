@@ -288,7 +288,10 @@ router.post('/sumarInteresIngresos',authe, async (req, res)=>{
 })
 router.post('/sumarEgresos',authe, async (req, res)=>{
     let totalCapital = await Egresos.aggregate([{ $match: { egreso:true} },{$group:{_id:null,"valor":{$sum:"$valor"}}}])
-    return res.status(200).json(totalCapital[0].valor)
+    let totalInicial = await Egresos.aggregate([{ $match: { cuotaInicial:{$gt:0}}},{$group:{_id:null,"valor":{$sum:"$cuotaInicial"}}}])
+    //console.log(totalInicial[0].valor+totalCapital[0].valor)
+    let t = totalInicial[0].valor+totalCapital[0].valor
+    return res.status(200).json(t)
 })
 router.post('/sumarCapitalCartera',authe, async (req, res)=>{
     let totalCapitalCartera = await valoresCredito.aggregate([{$group:{_id:null,"valor":{$sum:"$capital"}}}])
