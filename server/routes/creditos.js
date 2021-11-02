@@ -105,8 +105,10 @@ router.post('/cambiarPagares', authe, async (req, res)=>{
 })
 router.post('/contarCreditos', async (req, res) => {
     const cantidad = await Creditos.countDocuments()
+    const antes = 326
+    let total = (cantidad + antes)
     res.status(200).json({ 
-        cantidad
+        total
     })
 })
 router.post('/guardarCredito', async (req, res) => {
