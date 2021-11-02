@@ -288,7 +288,7 @@ router.post('/sumarInteresIngresos',authe, async (req, res)=>{
 })
 router.post('/sumarEgresos',authe, async (req, res)=>{
     let totalCapital = await Egresos.aggregate([{ $match: { egreso:true} },{$group:{_id:null,"valor":{$sum:"$valor"}}}])
-    let totalInicial = await Egresos.aggregate([{ $match: { cuotaInicial:{$gt:0}}},{$group:{_id:null,"valor":{$sum:"$cuotaInicial"}}}])
+    let totalInicial = await Egresos.aggregate([{ $match: { egreso:true,cuotaInicial:{$gt:0}}},{$group:{_id:null,"valor":{$sum:"$cuotaInicial"}}}])
     //console.log(totalInicial[0].valor+totalCapital[0].valor)
     let t = totalInicial[0].valor+totalCapital[0].valor
     return res.status(200).json(t)
