@@ -112,6 +112,8 @@ export default {
                     this.cargarValoresCapital()
                     this.cargarValoresInteres()
                     this.cargarValoresEgresos()
+                    this.desembolso = false,
+                    this.datosModal = {}
                 }else{
                     console.log(desembolsoOk.error)
                 }
