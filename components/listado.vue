@@ -33,7 +33,7 @@
           <tr v-for="credito in creditosPagar" :key="credito._id">
             <td id="num">{{credito.numeroCredito}}</td>
             <td id="servicio">{{credito.servicio}}</td>            
-            <td >{{credito.nombreCliente}}</td>
+            <td >{{credito.cliente.nombreCliente}} {{credito.cliente.primerApellidoCliente}} {{credito.cliente.segundoApellidoCliente}}</td>
             <td id="frecuencia">{{credito.frecuencia}}</td>
             <td>{{verFecha(credito.Fp)}}</td>
             <td>{{credito.valCuotaMens}}</td>
